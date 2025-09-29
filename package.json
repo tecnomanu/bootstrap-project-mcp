@@ -1,7 +1,7 @@
 {
 	"name": "bootstrap-project-mcp",
 	"version": "0.0.1-beta",
-	"description": "MCP Server para generar proyectos completos usando templates y prompts guiados. Soporta múltiples stacks: MCP, React, Astro, NestJS.",
+	"description": "MCP Server for generating complete projects using templates and guided prompts. Supports multiple stacks: MCP, React, Astro, NestJS.",
 	"type": "module",
 	"main": "dist/index.js",
 	"bin": {
@@ -52,5 +52,17 @@
 		"nodejs"
 	],
 	"author": "Bootstrap Project Team",
-	"license": "MIT"
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tecnomanu/bootstrap-project-mcp.git"
+	},
+	"bugs": {
+		"url": "https://github.com/tecnomanu/bootstrap-project-mcp/issues"
+	},
+	"homepage": "https://github.com/tecnomanu/bootstrap-project-mcp#readme",
+	"engines": {
+		"node": ">=18.0.0",
+		"pnpm": ">=8.0.0"
+	}
 }
