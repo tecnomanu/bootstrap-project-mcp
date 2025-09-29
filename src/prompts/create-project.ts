@@ -8,16 +8,22 @@ export const createProjectPrompt = [
 			description:
 				'Inicia el flujo completo de creación de proyectos con asistente inteligente',
 			argsSchema: {
-				stack: z.string(),
-				mode: z.string(),
+				stack: z
+					.enum(['mcp'])
+					.describe('Stack del proyecto (solo MCP disponible)'),
+				mode: z
+					.enum(['agent', 'interactive', 'quick'])
+					.describe(
+						'Modo de creación: agent (conversacional), interactive (formularios), quick (rápido)'
+					),
 			},
 		},
 		handler: ({
 			stack = 'mcp',
 			mode = 'interactive',
 		}: {
-			stack: string;
-			mode: string;
+			stack: 'mcp';
+			mode: 'agent' | 'interactive' | 'quick';
 		}) => ({
 			messages: [
 				{

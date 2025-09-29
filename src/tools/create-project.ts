@@ -20,15 +20,17 @@ export function registerProjectGenerationTools(server: McpServer) {
 				'Inicia el proceso de creación de un proyecto MCP con el modo seleccionado',
 			inputSchema: {
 				stack: z
-					.string()
+					.enum(['mcp'])
 					.optional()
 					.default('mcp')
 					.describe('Stack del proyecto (solo MCP disponible)'),
 				mode: z
-					.string()
+					.enum(['agent', 'interactive', 'quick'])
 					.optional()
 					.default('interactive')
-					.describe('Modo de creación: interactive, agent, quick'),
+					.describe(
+						'Modo de creación: agent (conversacional), interactive (formularios), quick (rápido)'
+					),
 			},
 		},
 		async ({ stack = 'mcp', mode = 'interactive' }, extra) => {
@@ -49,10 +51,6 @@ export function registerProjectGenerationTools(server: McpServer) {
 					};
 				}
 
-				// Forzar stack a MCP
-				const forcedStack = 'mcp';
-				logger.debug('Forced stack to MCP:', forcedStack);
-
 				// Normalizar modo
 				const normalizedMode = normalizeMode(mode);
 				logger.debug('Normalized mode:', normalizedMode);
@@ -60,13 +58,13 @@ export function registerProjectGenerationTools(server: McpServer) {
 				// Ejecutar según el modo seleccionado
 				switch (normalizedMode) {
 					case 'agent':
-						return await handleAgentMode(promptRegistry, forcedStack);
+						return await handleAgentMode(promptRegistry, stack);
 					case 'interactive':
-						return await handleInteractiveMode(server, forcedStack);
+						return await handleInteractiveMode(server, stack);
 					case 'quick':
-						return await handleQuickMode(server, extra, forcedStack);
+						return await handleQuickMode(server, extra, stack);
 					default:
-						return await handleAgentMode(promptRegistry, forcedStack);
+						return await handleAgentMode(promptRegistry, stack);
 				}
 			} catch (error) {
 				logger.error('Error in create_project tool:', error);
@@ -95,7 +93,7 @@ export function registerProjectGenerationTools(server: McpServer) {
 			description:
 				'Genera los archivos base del proyecto desde el template seleccionado',
 			inputSchema: {
-				stack: z.string().optional().default('mcp'),
+				stack: z.enum(['mcp']).optional().default('mcp'),
 				project_name: z
 					.string()
 					.min(1)
@@ -109,7 +107,7 @@ export function registerProjectGenerationTools(server: McpServer) {
 					.min(1)
 					.describe('Herramientas separadas por comas'),
 				template_type: z
-					.string()
+					.enum(['basic-mcp', 'api-integration-mcp', 'http-mcp'])
 					.optional()
 					.describe('Tipo de template a usar'),
 			},
@@ -146,9 +144,12 @@ export function registerProjectGenerationTools(server: McpServer) {
 				const kebabCaseName = TemplateService.toKebabCase(project_name);
 
 				// Seleccionar template apropiado si no se especifica
-				let selectedTemplate = template_type;
-				if (!selectedTemplate) {
-					selectedTemplate = templateService.selectTemplate({
+				let selectedTemplate:
+					| 'basic-mcp'
+					| 'api-integration-mcp'
+					| 'http-mcp' = template_type || 'basic-mcp';
+				if (!template_type) {
+					const autoSelected = templateService.selectTemplate({
 						hasApiIntegration:
 							tools.toLowerCase().includes('api') ||
 							domain.toLowerCase().includes('api'),
@@ -157,6 +158,17 @@ export function registerProjectGenerationTools(server: McpServer) {
 							domain.toLowerCase().includes('web'),
 						isBasic: true,
 					});
+
+					// Validar que el template auto-seleccionado sea válido
+					if (
+						autoSelected === 'basic-mcp' ||
+						autoSelected === 'api-integration-mcp' ||
+						autoSelected === 'http-mcp'
+					) {
+						selectedTemplate = autoSelected;
+					} else {
+						selectedTemplate = 'basic-mcp'; // fallback seguro
+					}
 				}
 
 				logger.info(`Using template: ${selectedTemplate}`);
@@ -322,7 +334,7 @@ ${exampleFiles}
 			description:
 				'Genera un prompt inteligente para crear el proyecto MCP completo',
 			inputSchema: {
-				stack: z.string().optional().default('mcp'),
+				stack: z.enum(['mcp']).optional().default('mcp'),
 				project_name: z
 					.string()
 					.min(1)
@@ -336,7 +348,7 @@ ${exampleFiles}
 					.min(1)
 					.describe('Herramientas separadas por comas'),
 				template_type: z
-					.string()
+					.enum(['basic-mcp', 'api-integration-mcp', 'http-mcp'])
 					.optional()
 					.describe('Tipo de template a usar'),
 			},
@@ -373,9 +385,12 @@ ${exampleFiles}
 				const kebabCaseName = TemplateService.toKebabCase(project_name);
 
 				// Seleccionar template apropiado
-				let selectedTemplate = template_type;
-				if (!selectedTemplate) {
-					selectedTemplate = templateService.selectTemplate({
+				let selectedTemplate:
+					| 'basic-mcp'
+					| 'api-integration-mcp'
+					| 'http-mcp' = template_type || 'basic-mcp';
+				if (!template_type) {
+					const autoSelected = templateService.selectTemplate({
 						hasApiIntegration:
 							tools.toLowerCase().includes('api') ||
 							domain.toLowerCase().includes('api'),
@@ -384,6 +399,17 @@ ${exampleFiles}
 							domain.toLowerCase().includes('web'),
 						isBasic: true,
 					});
+
+					// Validar que el template auto-seleccionado sea válido
+					if (
+						autoSelected === 'basic-mcp' ||
+						autoSelected === 'api-integration-mcp' ||
+						autoSelected === 'http-mcp'
+					) {
+						selectedTemplate = autoSelected;
+					} else {
+						selectedTemplate = 'basic-mcp'; // fallback seguro
+					}
 				}
 
 				// Generar herramientas formateadas
@@ -944,7 +970,7 @@ function normalizeMode(mode: string): string {
 function validateStack(stack: string): { isValid: boolean; message: string } {
 	const normalizedStack = stack.toLowerCase().trim();
 	const availableStacks = getAvailableStacks();
-	const stackNames = availableStacks.map(s => s.name.toLowerCase());
+	const stackNames = availableStacks.map((s) => s.name.toLowerCase());
 
 	if (stackNames.includes(normalizedStack)) {
 		return { isValid: true, message: '' };
@@ -958,7 +984,9 @@ function validateStack(stack: string): { isValid: boolean; message: string } {
 
 ## 📚 Stacks Disponibles:
 
-${availableStacks.map(s => `- **${s.name.toUpperCase()}**: ${s.description} (${s.status})`).join('\n')}
+${availableStacks
+	.map((s) => `- **${s.name.toUpperCase()}**: ${s.description} (${s.status})`)
+	.join('\n')}
 
 ## 💡 Solución:
 
@@ -984,7 +1012,8 @@ function getAvailableStacks() {
 		{
 			name: 'mcp',
 			status: '✅ Completamente funcional',
-			description: 'Model Context Protocol - Servidores MCP para Claude y otros agentes de IA',
+			description:
+				'Model Context Protocol - Servidores MCP para Claude y otros agentes de IA',
 			templates: ['basic-mcp', 'api-integration-mcp', 'http-mcp'],
 			tools: 4,
 		},

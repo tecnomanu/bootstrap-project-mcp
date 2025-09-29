@@ -1,6 +1,6 @@
 # 🚀 Bootstrap Project MCP
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/bootstrap-project-mcp) [![Version](https://img.shields.io/badge/version-1.0.1-blue)](https://github.com/bootstrap-project-mcp) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-purple)](https://modelcontextprotocol.io) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/) [![Node.js](https://img.shields.io/badge/Node.js-20+-green)](https://nodejs.org/)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/bootstrap-project-mcp) <img src="https://img.shields.io/npm/v/bootstrap-project-mcp.svg" alt="Version" /> [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-purple)](https://modelcontextprotocol.io) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/) [![Node.js](https://img.shields.io/badge/Node.js-20+-green)](https://nodejs.org/)
 
 **Español** | 🌍 **[English](./README.md)**
 
@@ -332,4 +332,3 @@ Esta es una **versión BETA**. ¡Apreciamos tu feedback!
 -   📧 **Contacto**: bootstrap-project-mcp@example.com
 
 **¡Ayúdanos a mejorarlo!** 🚀
-
