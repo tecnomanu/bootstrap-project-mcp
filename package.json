@@ -1,0 +1,56 @@
+{
+	"name": "bootstrap-project-mcp",
+	"version": "0.0.1-beta",
+	"description": "MCP Server para generar proyectos completos usando templates y prompts guiados. Soporta múltiples stacks: MCP, React, Astro, NestJS.",
+	"type": "module",
+	"main": "dist/index.js",
+	"bin": {
+		"bootstrap-project-mcp": "./dist/index.js"
+	},
+	"files": [
+		"dist",
+		"src"
+	],
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"build": "tsc && cp -r src/stacks dist/",
+		"pack": "npm pack",
+		"start": "node dist/index.js",
+		"install:global": "npm run build && npm install -g ./*.tgz",
+		"inspector": "npx @modelcontextprotocol/inspector npx bootstrap-project-mcp",
+		"lint": "eslint src --ext .ts",
+		"test": "jest"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.17.5",
+		"dotenv": "^16.3.1",
+		"zod": "^3.25.76"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.0.0",
+		"@types/node": "^20.0.0",
+		"@typescript-eslint/eslint-plugin": "^6.0.0",
+		"@typescript-eslint/parser": "^6.0.0",
+		"eslint": "^8.0.0",
+		"jest": "^29.0.0",
+		"tsx": "^4.0.0",
+		"typescript": "^5.0.0"
+	},
+	"keywords": [
+		"bootstrap",
+		"generator",
+		"template",
+		"project-generator",
+		"mcp",
+		"model-context-protocol",
+		"react",
+		"astro",
+		"nestjs",
+		"claude",
+		"ai",
+		"typescript",
+		"nodejs"
+	],
+	"author": "Bootstrap Project Team",
+	"license": "MIT"
+}

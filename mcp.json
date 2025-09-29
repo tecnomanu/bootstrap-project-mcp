@@ -1,0 +1,11 @@
+{
+	"mcpServers": {
+		"bootstrap-project-mcp": {
+			"command": "npx",
+			"args": ["bootstrap-project-mcp"],
+			"env": {
+				"MCP_TRANSPORT": "stdio"
+			}
+		}
+	}
+}
