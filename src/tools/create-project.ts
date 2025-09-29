@@ -23,7 +23,7 @@ export function registerProjectGenerationTools(server: McpServer) {
 					.string()
 					.optional()
 					.default('mcp')
-					.describe('Stack del proyecto'),
+					.describe('Stack del proyecto (solo MCP disponible)'),
 				mode: z
 					.string()
 					.optional()
@@ -35,6 +35,24 @@ export function registerProjectGenerationTools(server: McpServer) {
 			logger.debug('create_project tool called with:', { stack, mode });
 
 			try {
+				// Validar stack - solo MCP está disponible
+				const validatedStack = validateStack(stack);
+				if (!validatedStack.isValid) {
+					return {
+						content: [
+							{
+								type: 'text' as const,
+								text: validatedStack.message,
+							},
+						],
+						isError: true,
+					};
+				}
+
+				// Forzar stack a MCP
+				const forcedStack = 'mcp';
+				logger.debug('Forced stack to MCP:', forcedStack);
+
 				// Normalizar modo
 				const normalizedMode = normalizeMode(mode);
 				logger.debug('Normalized mode:', normalizedMode);
@@ -42,13 +60,13 @@ export function registerProjectGenerationTools(server: McpServer) {
 				// Ejecutar según el modo seleccionado
 				switch (normalizedMode) {
 					case 'agent':
-						return await handleAgentMode(promptRegistry, stack);
+						return await handleAgentMode(promptRegistry, forcedStack);
 					case 'interactive':
-						return await handleInteractiveMode(server, stack);
+						return await handleInteractiveMode(server, forcedStack);
 					case 'quick':
-						return await handleQuickMode(server, extra, stack);
+						return await handleQuickMode(server, extra, forcedStack);
 					default:
-						return await handleAgentMode(promptRegistry, stack);
+						return await handleAgentMode(promptRegistry, forcedStack);
 				}
 			} catch (error) {
 				logger.error('Error in create_project tool:', error);
@@ -642,6 +660,82 @@ Total: **${templates.length}** templates`,
 			}
 		}
 	);
+
+	// Tool: list_stacks (lista stacks disponibles)
+	server.registerTool(
+		'list_stacks',
+		{
+			title: '📚 Listar Stacks Disponibles',
+			description:
+				'Lista todos los stacks disponibles para generación de proyectos',
+			inputSchema: {
+				detailed: z
+					.boolean()
+					.optional()
+					.default(true)
+					.describe('Mostrar información detallada de cada stack'),
+			},
+		},
+		async ({ detailed = true }) => {
+			logger.debug('list_stacks tool called with:', { detailed });
+
+			const availableStacks = getAvailableStacks();
+
+			if (detailed) {
+				const stacksList = availableStacks
+					.map(
+						(stack) =>
+							`## 🎮 ${stack.name.toUpperCase()}
+**Estado**: ${stack.status}
+**Descripción**: ${stack.description}
+**Templates**: ${stack.templates.join(', ')}
+**Herramientas**: ${stack.tools} herramientas disponibles`
+					)
+					.join('\n\n');
+
+				return {
+					content: [
+						{
+							type: 'text' as const,
+							text: `📚 **Stacks Disponibles**
+
+Se encontraron **${availableStacks.length}** stacks:
+
+${stacksList}
+
+## 🚀 Uso
+
+Para crear un proyecto, usa:
+
+\`\`\`
+create_project({
+  stack: "${availableStacks[0]?.name || 'mcp'}",
+  mode: "agent" // o "interactive" o "quick"
+})
+\`\`\``,
+						},
+					],
+				};
+			} else {
+				const stacksList = availableStacks
+					.map((stack) => `- \`${stack.name}\` (${stack.status})`)
+					.join('\n');
+
+				return {
+					content: [
+						{
+							type: 'text' as const,
+							text: `📚 **Stacks Disponibles**
+
+${stacksList}
+
+Total: **${availableStacks.length}** stacks`,
+						},
+					],
+				};
+			}
+		}
+	);
 }
 
 async function handleAgentMode(promptRegistry: PromptRegistry, stack: string) {
@@ -845,4 +939,78 @@ function normalizeMode(mode: string): string {
 	};
 
 	return modeMap[normalized] || 'interactive'; // Default fallback
+}
+
+function validateStack(stack: string): { isValid: boolean; message: string } {
+	const normalizedStack = stack.toLowerCase().trim();
+	const availableStacks = getAvailableStacks();
+	const stackNames = availableStacks.map(s => s.name.toLowerCase());
+
+	if (stackNames.includes(normalizedStack)) {
+		return { isValid: true, message: '' };
+	}
+
+	return {
+		isValid: false,
+		message: `❌ **Stack "${stack}" no disponible**
+
+🚀 **Bootstrap Project MCP** actualmente solo soporta el stack **MCP**.
+
+## 📚 Stacks Disponibles:
+
+${availableStacks.map(s => `- **${s.name.toUpperCase()}**: ${s.description} (${s.status})`).join('\n')}
+
+## 💡 Solución:
+
+Usa \`create_project\` sin especificar stack (se configurará automáticamente a MCP) o especifica explícitamente:
+
+\`\`\`
+create_project({
+  stack: "mcp",
+  mode: "agent" // o "interactive" o "quick"
+})
+\`\`\`
+
+## 🔮 Próximamente:
+
+Los stacks **React**, **Astro**, **NestJS** y otros estarán disponibles en futuras versiones.
+
+**¿Necesitas otro stack?** Tendrás que crearlo manualmente por ahora. Este MCP server se especializa en generación de proyectos MCP.`,
+	};
+}
+
+function getAvailableStacks() {
+	return [
+		{
+			name: 'mcp',
+			status: '✅ Completamente funcional',
+			description: 'Model Context Protocol - Servidores MCP para Claude y otros agentes de IA',
+			templates: ['basic-mcp', 'api-integration-mcp', 'http-mcp'],
+			tools: 4,
+		},
+		// Futuros stacks (comentados hasta implementación)
+		/*
+		{
+			name: 'react',
+			status: '🔮 Próximamente',
+			description: 'Aplicaciones React con TypeScript',
+			templates: ['react-basic', 'react-vite', 'next-js'],
+			tools: 0,
+		},
+		{
+			name: 'astro',
+			status: '🔮 Próximamente', 
+			description: 'Sitios web estáticos y SSR con Astro',
+			templates: ['astro-blog', 'astro-portfolio', 'astro-ecommerce'],
+			tools: 0,
+		},
+		{
+			name: 'nestjs',
+			status: '🔮 Próximamente',
+			description: 'APIs backend robustas con NestJS',
+			templates: ['nestjs-rest', 'nestjs-graphql', 'nestjs-microservices'],
+			tools: 0,
+		},
+		*/
+	];
 }

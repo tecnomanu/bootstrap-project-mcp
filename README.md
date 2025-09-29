@@ -1,14 +1,14 @@
 # 🚀 Bootstrap Project MCP
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/bootstrap-project-mcp) [![Version](https://img.shields.io/badge/version-1.0.0--beta-orange)](https://github.com/bootstrap-project-mcp) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-purple)](https://modelcontextprotocol.io) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/) [![Node.js](https://img.shields.io/badge/Node.js-20+-green)](https://nodejs.org/)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/bootstrap-project-mcp) [![Version](https://img.shields.io/badge/version-1.0.1-blue)](https://github.com/bootstrap-project-mcp) [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE) [![MCP](https://img.shields.io/badge/MCP-Model%20Context%20Protocol-purple)](https://modelcontextprotocol.io) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://www.typescriptlang.org/) [![Node.js](https://img.shields.io/badge/Node.js-20+-green)](https://nodejs.org/)
 
 🌍 **[Español](./README_es.md)** | **English**
 
 **Bootstrap Project MCP** is a **MCP Server** for generating complete projects using templates and guided prompts. Supports multiple stacks: MCP, React, Astro, NestJS.
 
-**🚧 BETA VERSION** - This is a beta release. Some features may be experimental. Please report issues and provide feedback!
+**🚀 STABLE VERSION** - Ready for production use! Currently supports MCP stack generation.
 
-**How does it work?** Use simple commands in your IDE like `/bootstrap_wizard` that trigger intelligent conversational prompts. The agent asks you specific questions, selects the perfect template for your project, and in seconds you have a complete, functional project ready to use.
+**How does it work?** Use the `create_project` tool that offers 3 interaction modes: **Agent** (conversational), **Interactive** (guided questions), and **Quick** (fast setup). The system automatically selects the perfect template and generates a complete, functional MCP project ready to use.
 
 **What is MCP?** Model Context Protocol is an open standard that allows AI agents (like Claude) to connect with external tools and systems securely and in a standardized way.
 
@@ -30,8 +30,8 @@ It's a **specialized MCP server** that works as a project creation tool and:
 **Status**: ✅ Fully functional
 
 -   **Available templates**: Basic MCP, API Integration MCP, HTTP MCP
--   **Guided prompts**: `bootstrap_wizard`, `bootstrap_assistant`, `bootstrap_interactive`, `bootstrap_quick`
--   **Included resources**: Best Practices Guide, Prompt Starter
+-   **Interaction modes**: Agent (conversational), Interactive (guided), Quick (fast)
+-   **Included resources**: Best Practices Guide, Template System
 -   **MCP Tools**: 4 complete tools for project generation
 
 ### 🔮 Upcoming Stacks (Roadmap)
@@ -56,9 +56,9 @@ This intelligent command handles the entire project creation flow:
 
 ### 🎯 **Available Interaction Modes:**
 
--   **🧙‍♂️ Smart Assistant** - Natural and automatic conversation
--   **📋 Interactive Mode** - Step-by-step questions with full control
--   **⚡ Quick Mode** - Functional project in seconds
+-   **🧙‍♂️ Agent Mode** - Natural conversation via chat, the agent asks questions and guides you through the process
+-   **📋 Interactive Mode** - Step-by-step guided questions with form inputs (experimental, may fail in some environments)
+-   **⚡ Quick Mode** - Fast setup with minimal questions, creates a complete MCP project quickly
 
 ### 🔧 **Additional Tools** (Internal agent use):
 
@@ -105,18 +105,20 @@ Add to your `~/.config/mcp.json` or `~/Library/Application Support/Claude/mcp.js
 ```bash
 # In Claude Desktop - Just one command!
 create_project
+# The system will ask you to choose: agent, interactive, or quick mode
+# Stack is automatically set to MCP (only supported stack currently)
 ```
 
 **That's it!** The system will guide you step by step:
 
 ### 📋 **Automatic Flow:**
 
-1. **Stack Selection**: Choose your stack (currently MCP)
-2. **Mode Selection**: The agent asks which mode you prefer:
+1. **Stack Selection**: Automatically set to MCP (only supported stack)
+2. **Mode Selection**: The system asks which mode you prefer:
 
-    - 🧙‍♂️ **"assistant"** - Natural conversation
-    - 📋 **"interactive"** - Specific questions
-    - ⚡ **"quick"** - Instant basic template
+    - 🧙‍♂️ **"agent"** - Natural conversation via chat
+    - 📋 **"interactive"** - Guided questions with form inputs
+    - ⚡ **"quick"** - Fast setup with minimal questions
 
 3. **Auto-Detection**: The agent automatically detects:
 
@@ -139,10 +141,10 @@ Claude: 🚀 Welcome to the MCP Project Generator!
         📋 Interactive Mode - "interactive"
         ⚡ Quick Mode - "quick"
 
-User: assistant
+User: agent
 
 Claude: Perfect! Tell me what kind of project you need...
-        [Natural conversation that automatically detects everything]
+        [Natural conversation via chat that automatically detects everything]
 ```
 
 ## 🏗️ Architecture by Stacks
@@ -302,6 +304,7 @@ pnpm run build
 ```bash
 # In Claude Desktop - Just one command!
 create_project
+# Choose your mode: agent, interactive, or quick
 ```
 
 **It's that simple!** The system will automatically guide you through the entire process.
