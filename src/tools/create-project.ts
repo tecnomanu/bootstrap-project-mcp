@@ -796,58 +796,43 @@ async function handleInteractiveMode(server: McpServer, stack: string) {
 		typeof server.server?.elicitInput
 	);
 
-	// Intentar elicitación con timeout corto, si falla automáticamente usar modo agent
-	try {
-		logger.debug('Attempting elicitInput with 2 second timeout...');
-		const projectResponse = await Promise.race([
-			server.server.elicitInput({
-				message: 'Configura los detalles de tu proyecto MCP:',
-				requestedSchema: {
-					type: 'object',
-					properties: {
-						project_name: {
-							type: 'string',
-							title: 'Nombre del Proyecto',
-							description:
-								'Nombre del proyecto (sin espacios, usar kebab-case)',
-						},
-						domain: {
-							type: 'string',
-							title: 'Dominio del Proyecto',
-							description:
-								'Describe qué tipo de proyecto quieres crear',
-						},
-						tools: {
-							type: 'string',
-							title: 'Herramientas',
-							description:
-								'Lista las funcionalidades separadas por comas',
-						},
-					},
-					required: ['project_name', 'domain', 'tools'],
+	// Usar elicitación estándar sin timeout ni fallback
+	logger.debug('Attempting elicitInput...');
+	const projectResponse = await server.server.elicitInput({
+		message: 'Configura los detalles de tu proyecto MCP:',
+		requestedSchema: {
+			type: 'object',
+			properties: {
+				project_name: {
+					type: 'string',
+					title: 'Nombre del Proyecto',
+					description:
+						'Nombre del proyecto (sin espacios, usar kebab-case)',
 				},
-			}),
-			// Timeout muy corto - si no responde en 2 segundos, usar fallback
-			new Promise((_, reject) =>
-				setTimeout(
-					() =>
-						reject(
-							new Error('Elicitation timeout - UI not available')
-						),
-					2000
-				)
-			),
-		]);
+				domain: {
+					type: 'string',
+					title: 'Dominio del Proyecto',
+					description: 'Describe qué tipo de proyecto quieres crear',
+				},
+				tools: {
+					type: 'string',
+					title: 'Herramientas',
+					description:
+						'Lista las funcionalidades separadas por comas',
+				},
+			},
+			required: ['project_name', 'domain', 'tools'],
+		},
+	});
 
-		const config = (projectResponse as any).content;
-		logger.debug('Interactive mode config:', config);
+	const config = (projectResponse as any).content;
+	logger.debug('Interactive mode config:', config);
 
-		// Si llegamos aquí, la elicitación funcionó
-		return {
-			content: [
-				{
-					type: 'text' as const,
-					text: `📋 **Modo Interactivo - Configuración Completada**
+	return {
+		content: [
+			{
+				type: 'text' as const,
+				text: `📋 **Modo Interactivo - Configuración Completada**
 
 Has configurado tu proyecto MCP:
 
@@ -864,21 +849,9 @@ Ahora usa la función \`execute_create_project\` con estos parámetros:
 - template_type: "basic"
 
 Esto generará un prompt inteligente que incluye instrucciones para usar \`start_from_templates\` primero.`,
-				},
-			],
-		};
-	} catch (elicitError) {
-		logger.warn(
-			'Elicitation failed, switching to agent mode automatically:',
-			elicitError
-		);
-
-		// Fallback automático: usar modo agent
-		return await handleAgentMode(
-			new PromptRegistry(env.PROMPTS_DIR),
-			stack
-		);
-	}
+			},
+		],
+	};
 }
 
 async function handleQuickMode(server: McpServer, extra: any, stack: string) {
