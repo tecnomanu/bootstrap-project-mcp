@@ -37,10 +37,6 @@ export class PromptRegistry {
 					logger.error(`Error loading prompt ${file}:`, error);
 				}
 			}
-
-			logger.info(
-				`Loaded ${this.prompts.size} prompts from ${this.promptsDir}`
-			);
 		} catch (error) {
 			logger.error('Error loading prompts:', error);
 		}

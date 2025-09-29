@@ -25,12 +25,6 @@ async function main() {
 		const transport = new StdioServerTransport();
 		await server.connect(transport);
 
-		logger.info('🚀 MCP Bootstrap Server ready for Claude Desktop');
-		logger.info(
-			'📚 Available tools: create_project, start_from_templates, execute_create_project'
-		);
-		logger.info('🎯 Available prompts: generate_prompt_project');
-
 		process.on('SIGINT', async () => {
 			logger.info('Shutting down MCP Bootstrap...');
 			process.exit(0);
