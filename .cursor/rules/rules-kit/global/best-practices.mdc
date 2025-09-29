@@ -5,6 +5,7 @@ description: Global best practices for any development project
 globs: **/*
 alwaysApply: true
 ---
+
 # Global Best Practices
 
 This document defines best practices applicable to any development project, regardless of the technology stack used.
@@ -57,6 +58,13 @@ When creating or modifying any component of the system, follow these guidelines:
 2. **Durable Solutions**: Implement solutions that address the root problem.
 3. **Solution Documentation**: Document complex problems and their solutions.
 4. **Continuous Learning**: Learn from mistakes and continuously improve.
+
+## Package Publishing
+
+1. **NO Manual Publishing**: NEVER run `npm publish` manually - CI/CD handles all publishing
+2. **Semantic Versioning**: Use conventional commits to trigger automatic version bumps
+3. **CI/CD Pipeline**: Let GitHub Actions handle build, test, and publish automatically
+4. **Version Control**: Only commit version changes when absolutely necessary
 
 ## Teamwork
 
