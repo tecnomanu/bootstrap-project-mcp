@@ -8,14 +8,16 @@
 		"bootstrap-project-mcp": "./dist/index.js"
 	},
 	"files": [
-		"dist",
-		"src"
+		"dist/**/*",
+		"README.md",
+		"package.json"
 	],
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc && cp -r src/stacks dist/",
 		"pack": "npm pack",
 		"start": "node dist/index.js",
+		"clean": "rm -rf dist",
 		"install:global": "npm run build && npm install -g ./*.tgz",
 		"inspector": "npx @modelcontextprotocol/inspector npx bootstrap-project-mcp",
 		"lint": "eslint src --ext .ts",
